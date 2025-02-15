@@ -1,66 +1,38 @@
-#include "MAL.h"
-
-#include "ReadLine.h"
-#include "Types.h"
-
+#include <cstdlib>
 #include <iostream>
-#include <memory>
 
-malValuePtr READ(const String& input);
-String PRINT(malValuePtr ast);
+#include "reader.hpp"
 
-static ReadLine s_readLine("~/.mal-history");
+static std::string rep(std::string line);
+static std::unique_ptr<MalType> read(std::string line);
+static std::unique_ptr<MalType> eval(std::unique_ptr<MalType> ast);
+static std::string print(std::unique_ptr<MalType> ast);
 
-static String rep(const String& input);
-static malValuePtr EVAL(malValuePtr ast);
+int main(void) {
 
-int main(int argc, char* argv[])
-{
-    String prompt = "user> ";
-    String input;
-    while (s_readLine.get(prompt, input)) {
-        String out;
-        try {
-            out = rep(input);
-        }
-        catch (malEmptyInputException&) {
-            continue; // no output
-        }
-        catch (String& s) {
-            out = s;
-        };
-        std::cout << out << "\n";
+  std::string line;
+  for (;;) {
+    std::cout << "user> ";
+    std::getline(std::cin, line);
+    if (!std::cin) {
+      break;
     }
-    return 0;
+    try {
+      std::cout << rep(line) << std::endl;
+    } catch (std::runtime_error &e) {
+      std::cout << e.what() << std::endl;
+    }
+  }
+  
+  return EXIT_SUCCESS;
 }
 
-static String rep(const String& input)
-{
-    return PRINT(EVAL(READ(input)));
-}
+static std::string rep(std::string line) { return print(eval(read(line))); }
 
-malValuePtr READ(const String& input)
-{
-    return readStr(input);
-}
+static std::unique_ptr<MalType> read(std::string line) { return read_str(line); }
 
-static malValuePtr EVAL(malValuePtr ast)
-{
-    return ast;
-}
+static std::unique_ptr<MalType> eval(std::unique_ptr<MalType> ast) { return ast; }
 
-String PRINT(malValuePtr ast)
-{
-    return ast->print(true);
-}
-
-// These have been added after step 1 to keep the linker happy.
-malValuePtr EVAL(malValuePtr ast, malEnvPtr)
-{
-    return ast;
-}
-
-malValuePtr APPLY(malValuePtr ast, malValueIter, malValueIter)
-{
-    return ast;
+static std::string print(std::unique_ptr<MalType> ast) {
+  return ast->as_str();
 }

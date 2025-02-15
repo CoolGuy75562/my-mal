@@ -1,3 +1,9 @@
+This is the repository for my WIP mal implementation in C++. It is contained in /impls/cpp.
+
+See: https://github.com/kanaka/mal
+
+---
+
 # mal - Make a Lisp
 
 [![Build and Test](https://github.com/kanaka/mal/actions/workflows/main.yml/badge.svg)](https://github.com/kanaka/mal/actions/workflows/main.yml)
